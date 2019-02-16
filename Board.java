@@ -26,6 +26,8 @@ public class Board {
         
         setupWhitePieces();
         setupBlackPieces();
+        
+        deadPieces = new ArrayList<Integer>();
     }
     
     // Place white pieces in starting positions.
@@ -115,6 +117,11 @@ public class Board {
         
         // Otherwise make the move and return true
         
+        // If necessary, add black piece attacked to ArrayList deadpieces
+        if (boardState[proposedRow][proposedColumn] < 0) {
+            deadPieces.add(boardState[proposedRow][proposedColumn]);
+        }
+        
         // Replace original place with 0
         boardState[originalRow][originalColumn] = 0;
         
@@ -124,13 +131,100 @@ public class Board {
             boardState[proposedRow][proposedColumn] = 5;
         } 
         else {
-        boardState[proposedRow][proposedColumn] = 1;
+            boardState[proposedRow][proposedColumn] = 1;
         }
         
         return true;
         }
     
+    // makeAWhiteRookMove takes four arguments:
+    //  1) original row
+    //  2) original column
+    //  3) proposed row
+    //  4) proposed column
+    // and returns Boolean true or false if that move is valid.
+    // If the move is valid, the rook is moved to a new position,
+    // and any killed pieces are removed from the board and added
+    // to ArrayList deadPieces.
+    public Boolean makeAWhiteRookMove (int originalRow, int originalColumn, 
+            int proposedRow, int proposedColumn) {
+                 
+        
+        
+        return true;
+        }
+
+    // makeAWhiteKnightMove takes four arguments:
+    //  1) original row
+    //  2) original column
+    //  3) proposed row
+    //  4) proposed column
+    // and returns Boolean true or false if that move is valid.
+    // If the move is valid, the knight is moved to a new position,
+    // and any killed pieces are removed from the board and added
+    // to ArrayList deadPieces.
+    public Boolean makeAWhiteKnightMove (int originalRow, int originalColumn, 
+            int proposedRow, int proposedColumn) {
+                 
+        
+        
+        return true;
+        }
+
+    // makeAWhiteBishopMove takes four arguments:
+    //  1) original row
+    //  2) original column
+    //  3) proposed row
+    //  4) proposed column
+    // and returns Boolean true or false if that move is valid.
+    // If the move is valid, the knight is moved to a new position,
+    // and any killed pieces are removed from the board and added
+    // to ArrayList deadPieces. 
+    public Boolean makeAWhiteBishopMove (int originalRow, int originalColumn, 
+            int proposedRow, int proposedColumn) {
+                 
+        
+        
+        return true;
+        }
+
+    // makeAWhiteQueenMove takes four arguments:
+    //  1) original row
+    //  2) original column
+    //  3) proposed row
+    //  4) proposed column
+    // and returns Boolean true or false if that move is valid.
+    // If the move is valid, the queen is moved to a new position,
+    // and any killed pieces are removed from the board and added
+    // to ArrayList deadPieces. A shortcut can be used here. Just
+    // make this function a composite of the white queen and white
+    // rook.
+    public Boolean makeAWhiteQueenMove (int originalRow, int originalColumn, 
+            int proposedRow, int proposedColumn) {
+                 
+        
+        
+        return true;
+        }
     
+    // makeAWhiteKingMove takes four arguments:
+    //  1) original row
+    //  2) original column
+    //  3) proposed row
+    //  4) proposed column
+    // and returns Boolean true or false if that move is valid.
+    // If the move is valid, the king is moved to a new position,
+    // and any killed pieces are removed from the board and added
+    // to ArrayList deadPieces. This function must first check to 
+    // see if the king is moving into check; if so, then the move
+    // cannot be made.
+    public Boolean makeAWhiteKingMove (int originalRow, int originalColumn, 
+            int proposedRow, int proposedColumn) {
+                 
+        
+        
+        return true;
+        }
     
     // Print board method
     public void printBoard() {
