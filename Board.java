@@ -20,7 +20,6 @@ public class Board {
      is -1, a black bishop is -2, etc.
     */
     private int [][] boardState;   
-    
     private ArrayList <Integer> deadPieces; 
     
     // Default constructor starts a new board.
@@ -32,6 +31,21 @@ public class Board {
         setupBlackPieces();
         
         deadPieces = new ArrayList<Integer>();
+    }
+    
+    // Getter for boardState
+    public int[][] getBoard() {
+        return boardState;
+    }
+    
+    // Setter for boardState
+    public void setBoard(int[][]a) {
+        boardState = a;
+    }
+    
+    // Getter for deadPieces
+    public ArrayList<Integer> getDeadPieces() {
+        return deadPieces;
     }
     
     // Place white pieces in starting positions.
@@ -79,64 +93,85 @@ public class Board {
     public Boolean makeAWhitePawnMove (int originalRow, int originalColumn, 
             int proposedRow, int proposedColumn) {
         
-        // FIXME: First pawn move can be two spaces!
-        
-        
-        // Return false if pawn isn't trying to move one row ahead.
-        if (!(proposedRow == originalRow - 1)) {
-            System.out.println("Out 1"); // FIXME
+        // If pawn isn't where command says it should be, return false
+        if (boardState[originalRow][originalColumn] != 1) {
+            System.out.println("\nPawn isn't there\n");
             return false;
         }
         
-        // If there's already another white piece in proposed place, move
-        // cannot be made. Return false.
-        if (boardState[proposedRow][proposedColumn] > 0) {
-            System.out.println("Out 2"); // FIXME
-            return false;
-        }
+        int checkRow = originalRow;
+        int checkColumn = originalColumn;
         
-        // If there's a black piece in proposed place, move must be diagonal.
-        if (boardState[proposedRow][proposedColumn] < 0) {
-            System.out.println("Black piece");
-            // Return false if proposed column isn't adjacent to original
-            if (proposedColumn == originalColumn - 1) {
-                
+        // Make an 8x8 2D array representing pawn's valid moves
+        boolean [][] validPawnMoves = new boolean[8][8];
+
+        // Pawn can move one space forward as long as those spaces
+        // are currently unoccupied
+        try {
+            if ((boardState[checkRow - 1][checkColumn]) == 0)
+                validPawnMoves[checkRow - 1][checkColumn] = true;}
+        catch(Exception e) {}
+            
+        // If pawn is in initial row it can move up two spaces
+        if (originalRow == 6) {
+            try {
+                if (boardState[checkRow - 2][checkColumn] == 0) 
+                    validPawnMoves[checkRow - 2][checkColumn] = true;}
+            catch(Exception e) {}
+        }
+        // Pawn can attack an opponent up-left
+        try {
+            if ((boardState[checkRow - 1][checkColumn - 1]) < 0) 
+                validPawnMoves[checkRow - 1][checkColumn - 1] = true;}
+        catch (Exception e) {}
+            
+        // Pawn can attack an opponent up-right
+        try {
+            if ((boardState[checkRow - 1][checkColumn + 1]) < 0) 
+                validPawnMoves[checkRow - 1][checkColumn + 1] = true;}
+        catch (Exception e) {}
+            
+        /* For testing: Print potential pawn moves
+        System.out.println();
+        for (int i = 0; i < 8; i++) {
+            for (int j = 0; j < 8; j++) {
+                if (validPawnMoves[i][j] == true) {
+                    System.out.print(validPawnMoves[i][j] + "  ");
+                }
+                else {
+                    System.out.print(validPawnMoves[i][j] + " ");
+                }
             }
-            else if (proposedColumn == originalColumn + 1) {
-                
-            }
-            else {
-                return false;
-            }
+            System.out.println();
+        }
+        */
+        
+        // If proposed pawn move isn't valid, return false
+        if (validPawnMoves[proposedRow][proposedColumn] == false) {
+            System.out.println("\nNot a valid pawn move\n");
+            return false;
         }
 
-        // If the proposed position is empty and 1 row ahead of pawn, return
-        // true and make the move
-        if ((boardState[proposedRow][proposedColumn] == 0) && (proposedColumn == originalColumn) 
-                && (proposedRow == originalRow -1)) {
-            // FIXME
+        // If pawn's proposed position is empty, move it there
+        if (boardState[proposedRow][proposedColumn] == 0) {
+            boardState[originalRow][originalColumn] = 0;
+            boardState[proposedRow][proposedColumn] = 1;
         }
-        
-        
-        // Otherwise make the move and return true
-        
-        // If necessary, add black piece attacked to ArrayList deadpieces
-        if (boardState[proposedRow][proposedColumn] < 0) {
+        // If pawn's proposed position is occupied by opponent, take its place
+        // and add defeated foe to deadPieces Array List
+        else if (boardState[proposedRow][proposedColumn] < 0) {
             deadPieces.add(boardState[proposedRow][proposedColumn]);
-        }
-        
-        // Replace original place with 0
-        boardState[originalRow][originalColumn] = 0;
-        
-        // If proposedRow pawn is moving to is 0, replace pawn with queen.
-        // If it's any other number, just place the pawn there.
-        if (proposedRow == 0) {
-            boardState[proposedRow][proposedColumn] = 5;
-        } 
-        else {
+            boardState[originalRow][originalColumn] = 0;
             boardState[proposedRow][proposedColumn] = 1;
         }
         
+        // If pawn has reached row 0, then make it into a queen
+        if (proposedRow == 0) {
+            boardState[proposedRow][proposedColumn] = 5;
+            System.out.println("\nPawn --> Queen\n");
+        }
+        
+        System.out.println("\nPawn move successful\n");
         return true;
         }
     
@@ -152,7 +187,7 @@ public class Board {
     public Boolean makeAWhiteRookMove (int originalRow, int originalColumn, 
             int proposedRow, int proposedColumn) {
                 
-        // if rook isn't where command says it should be, return false
+        // If rook isn't where command says it should be, return false
         if (boardState[originalRow][originalColumn] != 4) {
             System.out.println("\nRook isn't there\n");
             return false;
@@ -281,10 +316,129 @@ public class Board {
     public Boolean makeAWhiteKnightMove (int originalRow, int originalColumn, 
             int proposedRow, int proposedColumn) {
                  
+        if (boardState[originalRow][originalColumn] != 3) {
+            System.out.println("Knight isn't there");
+            return false;
+        }
+        
+        // The ideal way to model a knight's moves is to model each of its
+        // potential jumps in try/catch blocks. Valid jumps are added to
+        // validKnightMoves 2D boolean array; invalid jumps don't cause errors.
+        boolean[][] validKnightMoves = new boolean[8][8];
+
+        int checkRow;
+        int checkColumn;
+
+        // up-right
+        checkRow = originalRow - 2;
+        checkColumn = originalColumn + 1;
+        try {
+            if(!(boardState[checkRow][checkColumn] > 0))
+                validKnightMoves[checkRow][checkColumn] = true;
+        }
+        catch(Exception e) {}
+        
+        // up-left
+        checkRow = originalRow - 2;
+        checkColumn = originalColumn - 1;
+        try {
+            if(!(boardState[checkRow][checkColumn] > 0))
+                validKnightMoves[checkRow][checkColumn] = true;
+        }
+        catch(Exception e) {}
+        
+        // right-up
+        checkRow = originalRow - 1;
+        checkColumn = originalColumn + 2;
+        try {
+            if(!(boardState[checkRow][checkColumn] > 0))
+                validKnightMoves[checkRow][checkColumn] = true;
+        }
+        catch(Exception e) {}
+
+        // right-down
+        checkRow = originalRow + 1;
+        checkColumn = originalColumn + 2;
+        try {
+            if(!(boardState[checkRow][checkColumn] > 0))
+                validKnightMoves[checkRow][checkColumn] = true;
+        }
+        catch(Exception e) {}
+
+
+        // down-right
+        checkRow = originalRow + 2;
+        checkColumn = originalColumn + 1;
+        try {
+            if(!(boardState[checkRow][checkColumn] > 0))
+                validKnightMoves[checkRow][checkColumn] = true;
+        }
+        catch(Exception e) {}
+
+        // down-left
+        checkRow = originalRow + 2;
+        checkColumn = originalColumn - 1;
+        try {
+            if(!(boardState[checkRow][checkColumn] > 0))
+                validKnightMoves[checkRow][checkColumn] = true;
+        }
+        catch(Exception e) {}
+        
+        // left-up
+        checkRow = originalRow - 1;
+        checkColumn = originalColumn - 2;
+        try {
+            if(!(boardState[checkRow][checkColumn] > 0))
+                validKnightMoves[checkRow][checkColumn] = true;
+        }
+        catch(Exception e) {}
+
+        // left-down
+        checkRow = originalRow - 1;
+        checkColumn = originalColumn - 2;
+        try {
+            if(!(boardState[checkRow][checkColumn] > 0))
+                validKnightMoves[checkRow][checkColumn] = true;
+        }
+        catch(Exception e) {}
+        
+        // For testing: Print potential knight moves
+        System.out.println();
+        for (int i = 0; i < 8; i++) {
+            for (int j = 0; j < 8; j++) {
+                if (validKnightMoves[i][j] == true) {
+                    System.out.print(validKnightMoves[i][j] + "  ");
+                }
+                else {
+                    System.out.print(validKnightMoves[i][j] + " ");
+                }
+            }
+            System.out.println();
+        }
+        
+        // if proposed move is not a valid knight move, return false
+        if (validKnightMoves[proposedRow][proposedColumn] == false) {
+            System.out.println();
+            System.out.println("Not a valid knight move\n");
+            return false;
+        }
+        
+        // If knight's proposed position is empty, move it there
+        if (boardState[proposedRow][proposedColumn] == 0) {
+            boardState[originalRow][originalColumn] = 0;
+            boardState[proposedRow][proposedColumn] = 3;
+        }
+        // If rook's proposed position is occupied by opponent, take its place
+        // and add defeated foe to deadPieces Array List
+        else if (boardState[proposedRow][proposedColumn] < 0) {
+            deadPieces.add(boardState[proposedRow][proposedColumn]);
+            boardState[originalRow][originalColumn] = 0;
+            boardState[proposedRow][proposedColumn] = 3;
+        }
         
         
         
-        
+        System.out.println("Knight move was a success");
         return true;
         }
 
@@ -382,7 +536,7 @@ public class Board {
             }
         }
         
-        // For testing: Print potential bishop moves
+        /* For testing: Print potential bishop moves
         System.out.println("Bishop moves");
         for (int i = 0; i < 8; i++) {
             for (int j = 0; j < 8; j++) {
@@ -395,11 +549,12 @@ public class Board {
             }
             System.out.println();
         }
+        */
         
-        // if proposed move is not a valid rook move, return false
+        // if proposed move is not a valid bishop move, return false
         if (validBishopMoves[proposedRow][proposedColumn] == false) {
             System.out.println();
-            System.out.println("Not a valid rook move\n");
+            System.out.println("Not a valid bishop move\n");
             return false;
         }
         
@@ -408,7 +563,7 @@ public class Board {
             boardState[originalRow][originalColumn] = 0;
             boardState[proposedRow][proposedColumn] = 2;
         }
-        // If rook's proposed position is occupied by opponent, take its place
+        // If bishop's proposed position is occupied by opponent, take its place
         // and add defeated foe to deadPieces Array List
         else if (boardState[proposedRow][proposedColumn] < 0) {
             deadPieces.add(boardState[proposedRow][proposedColumn]);
@@ -428,14 +583,194 @@ public class Board {
     // and returns Boolean true or false if that move is valid.
     // If the move is valid, the queen is moved to a new position,
     // and any killed pieces are removed from the board and added
-    // to ArrayList deadPieces. A shortcut can be used here. Just
-    // make this function a composite of the white queen and white
-    // rook.
+    // to ArrayList deadPieces. 
     public Boolean makeAWhiteQueenMove (int originalRow, int originalColumn, 
             int proposedRow, int proposedColumn) {
                  
+        if (boardState[originalRow][originalColumn] != 5) {
+            System.out.println("\nQueen isn't there\n");
+            return false;
+        }
         
+        // Make an 8x8 2D array
+        boolean [][] validQueenMoves = new boolean[8][8];
         
+        int checkRow = originalRow;
+        int checkColumn = originalColumn;
+        
+        // Check up from queen
+        while (checkRow != 0) {
+            checkRow--;
+            if (boardState[checkRow][checkColumn] == 0) {
+                validQueenMoves[checkRow][checkColumn] = true;
+            }
+            else if (boardState[checkRow][checkColumn] > 0) {
+                break;
+            }
+            else if (boardState[checkRow][checkColumn] < 0) {
+                validQueenMoves[checkRow][checkColumn] = true;
+                break;
+            }
+        }
+        
+        // Check down from queen
+        checkRow = originalRow;
+        checkColumn = originalColumn;
+        while (checkRow != 7) {
+            checkRow++;
+            if (boardState[checkRow][checkColumn] == 0) {
+                validQueenMoves[checkRow][checkColumn] = true;
+            }
+            else if (boardState[checkRow][checkColumn] > 0) {
+                break;
+            }
+            else if (boardState[checkRow][checkColumn] < 0) {
+                validQueenMoves[checkRow][checkColumn] = true;
+                break;
+            }
+        }
+        
+        // Check left from queen
+        checkRow = originalRow;
+        checkColumn = originalColumn;
+        while (checkColumn != 0) {
+            checkColumn--;
+            if (boardState[checkRow][checkColumn] == 0) {
+                validQueenMoves[checkRow][checkColumn] = true;
+            }
+            else if (boardState[checkRow][checkColumn] > 0) {
+                break;
+            }
+            else if (boardState[checkRow][checkColumn] < 0) {
+                validQueenMoves[checkRow][checkColumn] = true;
+                break;
+            }
+        }
+        
+        // Check right from queen
+        checkRow = originalRow;
+        checkColumn = originalColumn;
+        while (checkColumn != 7) {
+            checkColumn++;
+            if (boardState[checkRow][checkColumn] == 0) {
+                validQueenMoves[checkRow][checkColumn] = true;
+            }
+            else if (boardState[checkRow][checkColumn] > 0) {
+                break;
+            }
+            else if (boardState[checkRow][checkColumn] < 0) {
+                validQueenMoves[checkRow][checkColumn] = true;
+                break;
+            }
+        }
+        
+        checkRow = originalRow;
+        checkColumn = originalColumn;
+        // Check up-right from queen
+        while ((checkRow != 0) && (checkColumn != 7)) {
+            checkRow--;
+            checkColumn++;
+            if (boardState[checkRow][checkColumn] == 0) {
+                validQueenMoves[checkRow][checkColumn] = true;
+            }
+            else if (boardState[checkRow][checkColumn] > 0) {
+                break;
+            }
+            else if (boardState[checkRow][checkColumn] < 0) {
+                validQueenMoves[checkRow][checkColumn] = true;
+                break;
+            }
+        }
+                
+        // Check down-right from queen
+        checkRow = originalRow;
+        checkColumn = originalColumn;
+        while ((checkRow != 7) && (checkColumn != 7)) {
+            checkRow++;
+            checkColumn++;
+            if (boardState[checkRow][checkColumn] == 0) {
+                validQueenMoves[checkRow][checkColumn] = true;
+            }
+            else if (boardState[checkRow][checkColumn] > 0) {
+                break;
+            }
+            else if (boardState[checkRow][checkColumn] < 0) {
+                validQueenMoves[checkRow][checkColumn] = true;
+                break;
+            }
+        }
+        
+        // Check down-left from queen
+        checkRow = originalRow;
+        checkColumn = originalColumn;
+        while ((checkRow != 7) && (checkColumn != 0)) {
+            checkRow++;
+            checkColumn--;
+            if (boardState[checkRow][checkColumn] == 0) {
+                validQueenMoves[checkRow][checkColumn] = true;
+            }
+            else if (boardState[checkRow][checkColumn] > 0) {
+                break;
+            }
+            else if (boardState[checkRow][checkColumn] < 0) {
+                validQueenMoves[checkRow][checkColumn] = true;
+                break;
+            }
+        }
+        
+        // Check up-left from queen
+        checkRow = originalRow;
+        checkColumn = originalColumn;
+        while ((checkRow != 0) && (checkColumn != 0)) {
+            checkRow--;
+            checkColumn--;
+            if (boardState[checkRow][checkColumn] == 0) {
+                validQueenMoves[checkRow][checkColumn] = true;
+            }
+            else if (boardState[checkRow][checkColumn] > 0) {
+                break;
+            }
+            else if (boardState[checkRow][checkColumn] < 0) {
+                validQueenMoves[checkRow][checkColumn] = true;
+                break;
+            }
+        }
+        
+        // For testing: Print potential queen moves
+        System.out.println("Queen moves");
+        for (int i = 0; i < 8; i++) {
+            for (int j = 0; j < 8; j++) {
+                if (validQueenMoves[i][j] == true) {
+                    System.out.print(validQueenMoves[i][j] + "  ");
+                }
+                else {
+                    System.out.print(validQueenMoves[i][j] + " ");
+                }
+            }
+            System.out.println();
+        }
+        
+        // if proposed move is not a valid queen move, return false
+        if (validQueenMoves[proposedRow][proposedColumn] == false) {
+            System.out.println();
+            System.out.println("Not a valid queen move\n");
+            return false;
+        }
+        
+        // If queen's proposed position is empty, move it there
+        if (boardState[proposedRow][proposedColumn] == 0) {
+            boardState[originalRow][originalColumn] = 0;
+            boardState[proposedRow][proposedColumn] = 5;
+        }
+        // If queen's proposed position is occupied by opponent, take its place
+        // and add defeated foe to deadPieces Array List
+        else if (boardState[proposedRow][proposedColumn] < 0) {
+            deadPieces.add(boardState[proposedRow][proposedColumn]);
+            boardState[originalRow][originalColumn] = 0;
+            boardState[proposedRow][proposedColumn] = 5;
+        }
+        
+        System.out.println("Queen move was successful");
         return true;
         }
     
@@ -447,14 +782,141 @@ public class Board {
     // and returns Boolean true or false if that move is valid.
     // If the move is valid, the king is moved to a new position,
     // and any killed pieces are removed from the board and added
-    // to ArrayList deadPieces. This function must first check to 
-    // see if the king is moving into check; if so, then the move
-    // cannot be made.
+    // to ArrayList deadPieces. 
     public Boolean makeAWhiteKingMove (int originalRow, int originalColumn, 
             int proposedRow, int proposedColumn) {
                  
+        // if king isn't where command says it should be, return false
+        if (boardState[originalRow][originalColumn] != 6) {
+            System.out.println("\nKing isn't there\n");
+            return false;
+        }
         
+        int checkRow;
+        int checkColumn;
         
+        // Make an 8x8 2D array for possible king moves
+        // Unlike the other pieces, this is an integer array
+        // 0 indicates that the king cannot move there
+        // 1 indicates that the king can move there
+        // -1 indicates that if the king moved there, it would be put in check
+        int [][] validKingMoves = new int[8][8];
+        
+        // check up from king
+        checkRow = originalRow;
+        checkColumn = originalColumn;    
+        try {
+            if ((boardState[checkRow - 1][checkColumn]) == 0)
+                validKingMoves[checkRow - 1][checkColumn] = 1;}
+        catch(Exception e) {}
+        
+        // check up-right from king
+        checkRow = originalRow;
+        checkColumn = originalColumn;    
+        try {
+            if ((boardState[checkRow - 1][checkColumn + 1]) == 0)
+                validKingMoves[checkRow - 1][checkColumn + 1] = 1;}
+        catch(Exception e) {}
+        
+        // check up-left from king
+        checkRow = originalRow;
+        checkColumn = originalColumn;    
+        try {
+            if ((boardState[checkRow - 1][checkColumn - 1]) == 0)
+                validKingMoves[checkRow - 1][checkColumn - 1] = 1;}
+        catch(Exception e) {}
+        
+        // check left from king
+        checkRow = originalRow;
+        checkColumn = originalColumn;    
+        try {
+            if ((boardState[checkRow][checkColumn - 1]) == 0)
+                validKingMoves[checkRow][checkColumn - 1] = 1;}
+        catch(Exception e) {}
+        
+        // check left-down from king
+        checkRow = originalRow;
+        checkColumn = originalColumn;    
+        try {
+            if ((boardState[checkRow + 1][checkColumn - 1]) == 0)
+                validKingMoves[checkRow + 1][checkColumn - 1] = 1;}
+        catch(Exception e) {}
+        
+        // check down from king
+        checkRow = originalRow;
+        checkColumn = originalColumn;    
+        try {
+            if ((boardState[checkRow + 1][checkColumn]) == 0)
+                validKingMoves[checkRow + 1][checkColumn] = 1;}
+        catch(Exception e) {}
+        
+        // check down-right from king
+        checkRow = originalRow;
+        checkColumn = originalColumn;    
+        try {
+            if ((boardState[checkRow + 1][checkColumn + 1]) == 0)
+                validKingMoves[checkRow + 1][checkColumn + 1] = 1;}
+        catch(Exception e) {}
+        
+        // check right from king
+        checkRow = originalRow;
+        checkColumn = originalColumn;    
+        try {
+            if ((boardState[checkRow][checkColumn + 1]) == 0)
+                validKingMoves[checkRow][checkColumn + 1] = 1;}
+        catch(Exception e) {}
+        
+        /* 
+        For testing: Print potential king moves
+        System.out.println();
+        for (int i = 0; i < 8; i++) {
+            for (int j = 0; j < 8; j++) {
+                if (validKingMoves[i][j] == 1) {
+                    System.out.print(validKingMoves[i][j] + " ");
+                }
+                else {
+                    System.out.print(validKingMoves[i][j] + " ");
+                }
+            }
+            System.out.println();
+        }
+        */
+        
+        // FIXME: Need to model king's potential moves into check,
+        // and println "Cannot move King into check" it tries to do that 
+        // Step 1: Model all opponent pieces' positions
+        // Step 2: Model all positions that opponent pawns check
+        // Step 3: Model all positions that opponent bishops check
+        // Step 4: Model all positions that opponent knights check
+        // Step 5: Model all positions that opponent rooks check
+        // Step 6: Model all positions that opponent queens check
+        // Step 7: Model all positions that opponent kings check
+        // This is now a 2D-array of opponents' checks
+        // Transpose this array onto the validKingMoves array
+        // If the proposed move will move the King into check, print a message
+        // 'Cannot move king into check' and return false
+        
+        // if proposed move is not a valid king move, return false
+        if (validKingMoves[proposedRow][proposedColumn] != 1) {
+            System.out.println();
+            System.out.println("Not a valid king move\n");
+            return false;
+        }
+        
+        // If king's proposed position is empty, move it there
+        if (boardState[proposedRow][proposedColumn] == 0) {
+            boardState[originalRow][originalColumn] = 0;
+            boardState[proposedRow][proposedColumn] = 6;
+        }
+        // If rook's proposed position is occupied by opponent, take its place
+        // and add defeated foe to deadPieces Array List
+        else if (boardState[proposedRow][proposedColumn] < 0) {
+            deadPieces.add(boardState[proposedRow][proposedColumn]);
+            boardState[originalRow][originalColumn] = 0;
+            boardState[proposedRow][proposedColumn] = 6;
+        }
+        
+        System.out.println("Successful king move");
         return true;
         }
     
