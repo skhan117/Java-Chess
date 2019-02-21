@@ -2,11 +2,9 @@
     Board class models a chessboard, the positions of its pieces, and the
     possible moves its pieces may make. 
 */
-
 import java.util.*;
 
 public class Board {
-
     /*
     A two-dimensional integer array boardState
     depicts a particular state of the chess board where:
@@ -785,7 +783,7 @@ public class Board {
     // to ArrayList deadPieces. 
     public Boolean makeAWhiteKingMove (int originalRow, int originalColumn, 
             int proposedRow, int proposedColumn) {
-                 
+        
         // if king isn't where command says it should be, return false
         if (boardState[originalRow][originalColumn] != 6) {
             System.out.println("\nKing isn't there\n");
@@ -865,10 +863,10 @@ public class Board {
             if ((boardState[checkRow][checkColumn + 1]) == 0)
                 validKingMoves[checkRow][checkColumn + 1] = 1;}
         catch(Exception e) {}
-        
-        /* 
+                
+        /*
         For testing: Print potential king moves
-        System.out.println();
+        System.out.println("Valid king moves");
         for (int i = 0; i < 8; i++) {
             for (int j = 0; j < 8; j++) {
                 if (validKingMoves[i][j] == 1) {
@@ -882,24 +880,539 @@ public class Board {
         }
         */
         
+        
         // FIXME: Need to model king's potential moves into check,
         // and println "Cannot move King into check" it tries to do that 
-        // Step 1: Model all opponent pieces' positions
-        // Step 2: Model all positions that opponent pawns check
-        // Step 3: Model all positions that opponent bishops check
-        // Step 4: Model all positions that opponent knights check
-        // Step 5: Model all positions that opponent rooks check
-        // Step 6: Model all positions that opponent queens check
-        // Step 7: Model all positions that opponent kings check
-        // This is now a 2D-array of opponents' checks
-        // Transpose this array onto the validKingMoves array
-        // If the proposed move will move the King into check, print a message
-        // 'Cannot move king into check' and return false
         
+        // Step 1: Copy all black pieces to 2d array blackPieces
+        int[][] blackPieces = new int[8][8];
+        int[][] blackChecking = new int[8][8];
+        
+        for (int i = 0; i < 8; i++) {
+            for (int j = 0; j < 8; j++) {
+                if (boardState[i][j] < 0) {
+                    blackPieces[i][j] = boardState[i][j];
+                }
+            }
+        }
+                
+        for (int i = 0; i < 8; i++) {
+            for (int j = 0; j < 8; j++) {
+                // Step 2: Model all positions black pawns check
+                if (blackPieces[i][j] == -1) {
+                    try {
+                        blackChecking[i + 1][j - 1] = -1;}
+                    catch(Exception e) {};
+                    try {
+                        blackChecking[i + 1][j + 1] = -1;}
+                    catch(Exception e){};
+                }
+                
+                // Step 3: Model all positions that black bishops check
+                if (blackPieces[i][j] == -2) {
+                    int bishopRow = i;
+                    int bishopColumn = j;
+                    int checkThisRow;
+                    int checkThisColumn;
+                    
+                    // check up-right from black bishop
+                    checkThisRow = bishopRow;
+                    checkThisColumn = bishopColumn;
+                    while ((checkThisRow >= 0) && (checkThisColumn) <= 7) {
+                        checkThisRow--;
+                        checkThisColumn++;
+                        try {
+                            if (boardState[checkThisRow][checkThisColumn] == 0) {
+                                blackChecking[checkThisRow][checkThisColumn] = -1;
+                            }
+                            else if (boardState[checkThisRow][checkThisColumn] > 0) {
+                                blackChecking[checkThisRow][checkThisColumn] = -1;
+                                break;
+                            }
+                            else {
+                                break;
+                            }
+                        }
+                        catch (Exception e) {}
+                    }
+                    
+                    // check down-right from black bishop
+                    checkThisRow = bishopRow;
+                    checkThisColumn = bishopColumn;
+                    while ((checkThisRow <= 7) && (checkThisColumn) <= 7) {
+                        checkThisRow++;
+                        checkThisColumn++;
+                        try {
+                            if (boardState[checkThisRow][checkThisColumn] == 0) {
+                                blackChecking[checkThisRow][checkThisColumn] = -1;
+                            }
+                            else if (boardState[checkThisRow][checkThisColumn] > 0) {
+                                blackChecking[checkThisRow][checkThisColumn] = -1;
+                                break;
+                            }
+                            else {
+                                break;
+                            }
+                        }
+                        catch (Exception e) {}
+                    }
+                    
+                    // check down-left from black bishop
+                    checkThisRow = bishopRow;
+                    checkThisColumn = bishopColumn;
+                    while ((checkThisRow <= 7) && (checkThisColumn) >= 0) {
+                        checkThisRow++;
+                        checkThisColumn--;
+                        try {
+                            if (boardState[checkThisRow][checkThisColumn] == 0) {
+                                blackChecking[checkThisRow][checkThisColumn] = -1;
+                            }
+                            else if (boardState[checkThisRow][checkThisColumn] > 0) {
+                                blackChecking[checkThisRow][checkThisColumn] = -1;
+                                break;
+                            }
+                            else {
+                                break;
+                            }
+                        }
+                        catch (Exception e) {}
+                    }
+
+                    // check up-left from black bishop
+                    checkThisRow = bishopRow;
+                    checkThisColumn = bishopColumn;
+                    while ((checkThisRow >= 0) && (checkThisColumn) >= 0) {
+                        checkThisRow--;
+                        checkThisColumn--;
+                        try {
+                            if (boardState[checkThisRow][checkThisColumn] == 0) {
+                                blackChecking[checkThisRow][checkThisColumn] = -1;
+                            }
+                            else if (boardState[checkThisRow][checkThisColumn] > 0) {
+                                blackChecking[checkThisRow][checkThisColumn] = -1;
+                                break;
+                            }
+                            else {
+                                break;
+                            }
+                        }
+                        catch (Exception e) {}
+                    }                    
+                } 
+                
+                // Step 4: Model all positions that black rook checks
+                if (blackPieces[i][j] == -4) {
+                    int rookRow = i;
+                    int rookColumn = j;
+                    int checkThisRow;
+                    int checkThisColumn;
+                    
+                    // check up from black rook
+                    checkThisRow = rookRow;
+                    checkThisColumn = rookColumn;
+                    while (checkThisRow >= 0) {
+                        checkThisRow--;
+                        try {
+                            if (boardState[checkThisRow][checkThisColumn] == 0) {
+                                blackChecking[checkThisRow][checkThisColumn] = -1;
+                            }
+                            else if (boardState[checkThisRow][checkThisColumn] > 0) {
+                                blackChecking[checkThisRow][checkThisColumn] = -1;
+                                break;
+                            }
+                            else {
+                                break;
+                            }
+                        }
+                        catch (Exception e) {}
+                    }
+                    
+                    // check right from black rook
+                    checkThisRow = rookRow;
+                    checkThisColumn = rookColumn;
+                    while (checkThisColumn <= 7) {
+                        checkThisColumn++;
+                        try {
+                            if (boardState[checkThisRow][checkThisColumn] == 0) {
+                                blackChecking[checkThisRow][checkThisColumn] = -1;
+                            }
+                            else if (boardState[checkThisRow][checkThisColumn] > 0) {
+                                blackChecking[checkThisRow][checkThisColumn] = -1;
+                                break;
+                            }
+                            else {
+                                break;
+                            }
+                        }
+                        catch (Exception e) {}
+                    }
+                    
+                    // check down from black rook
+                    checkThisRow = rookRow;
+                    checkThisColumn = rookColumn;
+                    while (checkThisRow <= 7) {
+                        checkThisRow++;
+                        try {
+                            if (boardState[checkThisRow][checkThisColumn] == 0) {
+                                blackChecking[checkThisRow][checkThisColumn] = -1;
+                            }
+                            else if (boardState[checkThisRow][checkThisColumn] > 0) {
+                                blackChecking[checkThisRow][checkThisColumn] = -1;
+                                break;
+                            }
+                            else {
+                                break;
+                            }
+                        }
+                        catch (Exception e) {}
+                    }
+
+                    // check left from black rook
+                    checkThisRow = rookRow;
+                    checkThisColumn = rookColumn;
+                    while (checkThisColumn >= 0) {
+                        checkThisColumn--;
+                        try {
+                            if (boardState[checkThisRow][checkThisColumn] == 0) {
+                                blackChecking[checkThisRow][checkThisColumn] = -1;
+                            }
+                            else if (boardState[checkThisRow][checkThisColumn] > 0) {
+                                blackChecking[checkThisRow][checkThisColumn] = -1;
+                                break;
+                            }
+                            else {
+                                break;
+                            }
+                        }
+                        catch (Exception e) {}
+                    }                    
+                }
+
+                // Step 5: Model all positions that black knights check
+                if (blackPieces[i][j] == -3) {                   
+                    int checkThisRow = i;
+                    int checkThisColumn = j;
+                    
+                    // check up-right
+                    try {
+                        if (boardState[checkThisRow - 2][checkThisColumn + 1] >= 0) {
+                            blackChecking[checkThisRow - 2][checkThisColumn + 1] = -1;
+                        }
+                    }
+                    catch (Exception e) {};
+                    // check up-left
+                    try {
+                        if (boardState[checkThisRow - 2][checkThisColumn - 1] >= 0) {
+                            blackChecking[checkThisRow - 2][checkThisColumn -1] = -1;
+                        }
+                    }
+                    catch (Exception e) {};
+                    // check right-up
+                    try {
+                        if (boardState[checkThisRow - 1][checkThisColumn + 2] >= 0) {
+                            blackChecking[checkThisRow - 1][checkThisColumn + 2] = -1;
+                        }
+                    }
+                    catch (Exception e) {};
+                    // check right-down
+                    try {
+                        if (boardState[checkThisRow + 1][checkThisColumn + 2] >= 0) {
+                            blackChecking[checkThisRow + 1][checkThisColumn + 2] = -1;
+                        }
+                    }
+                    catch (Exception e) {};
+                    // check down-right
+                    try {
+                        if (boardState[checkThisRow + 2][checkThisColumn + 1] >= 0) {
+                            blackChecking[checkThisRow + 2][checkThisColumn + 1] = -1;
+                        }
+                    }
+                    catch (Exception e) {};
+                    // check down-left
+                    try {
+                        if (boardState[checkThisRow + 2][checkThisColumn - 1] >= 0) {
+                            blackChecking[checkThisRow + 2][checkThisColumn - 1] = -1;
+                        }
+                    }
+                    catch (Exception e) {};
+                    // check left-down
+                    try {
+                        if (boardState[checkThisRow + 1][checkThisColumn - 2] >= 0) {
+                            blackChecking[checkThisRow + 1][checkThisColumn -2] = -1;
+                        }
+                    }
+                    catch (Exception e) {};
+                    // check left-up
+                    try {
+                        if (boardState[checkThisRow - 1][checkThisColumn - 2] >= 0) {
+                            blackChecking[checkThisRow - 1][checkThisColumn - 2] = -1;
+                        }
+                    }
+                    catch (Exception e) {};                    
+                } // close black knight checking branch
+                
+                // Step 6: Model all positions that black king checks
+                if (blackPieces[i][j] == -6) {
+                    int checkThisRow = i;
+                    int checkThisColumn = j;
+                    
+                    // check up from king
+                    try {
+                        if (boardState[checkThisRow - 1][checkThisColumn] >= 0) {
+                            blackChecking[checkThisRow - 1][checkThisColumn] = -1;
+                        }
+                    }
+                    catch(Exception e) {};
+                    // check up-right from king
+                    try {
+                        if (boardState[checkThisRow - 1][checkThisColumn + 1] >= 0) {
+                            blackChecking[checkThisRow - 1][checkThisColumn + 1] = -1;
+                        }
+                    }
+                    catch(Exception e) {};
+                    // check right from king
+                    try {
+                        if (boardState[checkThisRow][checkThisColumn + 1] >= 0) {
+                            blackChecking[checkThisRow][checkThisColumn + 1] = -1;
+                        }
+                    }
+                    catch(Exception e) {};
+                    // check down-right from king
+                    try {
+                        if (boardState[checkThisRow + 1][checkThisColumn + 1] >= 0) {
+                            blackChecking[checkThisRow + 1][checkThisColumn + 1] = -1;
+                        }
+                    }
+                    catch(Exception e) {};
+                    // check down from king
+                    try {
+                        if (boardState[checkThisRow + 1][checkThisColumn] >= 0) {
+                            blackChecking[checkThisRow + 1][checkThisColumn] = -1;
+                        }
+                    }
+                    catch(Exception e) {};
+                    // check down-left from king
+                    try {
+                        if (boardState[checkThisRow + 1][checkThisColumn - 1] >= 0) {
+                            blackChecking[checkThisRow + 1][checkThisColumn - 1] = -1;
+                        }
+                    }
+                    catch(Exception e) {};
+                    // check left from king
+                    try {
+                        if (boardState[checkThisRow][checkThisColumn - 1] >= 0) {
+                            blackChecking[checkThisRow][checkThisColumn - 1] = -1;
+                        }
+                    }
+                    catch(Exception e) {};
+                    // check left-up from king
+                    try {
+                        if (boardState[checkThisRow - 1][checkThisColumn - 1] >= 0) {
+                            blackChecking[checkThisRow - 1][checkThisColumn - 1] = -1;
+                        }
+                    }
+                    catch(Exception e) {};    
+                }
+                
+                // Step 7: Model all positions that black queen checks
+                if (blackPieces[i][j] == -5) {
+                    int queenRow = i;
+                    int queenColumn = j;
+                    
+                    // check up-right from black queen
+                    int checkThisRow = queenRow;
+                    int checkThisColumn = queenColumn;
+                    while ((checkThisRow >= 0) && (checkThisColumn) <= 7) {
+                        checkThisRow--;
+                        checkThisColumn++;
+                        try {
+                            if (boardState[checkThisRow][checkThisColumn] == 0) {
+                                blackChecking[checkThisRow][checkThisColumn] = -1;
+                            }
+                            else if (boardState[checkThisRow][checkThisColumn] > 0) {
+                                blackChecking[checkThisRow][checkThisColumn] = -1;
+                                break;
+                            }
+                            else {
+                                break;
+                            }
+                        }
+                        catch (Exception e) {}
+                    }
+                    
+                    // check down-right from black queen
+                    checkThisRow = queenRow;
+                    checkThisColumn = queenColumn;
+                    while ((checkThisRow <= 7) && (checkThisColumn) <= 7) {
+                        checkThisRow++;
+                        checkThisColumn++;
+                        try {
+                            if (boardState[checkThisRow][checkThisColumn] == 0) {
+                                blackChecking[checkThisRow][checkThisColumn] = -1;
+                            }
+                            else if (boardState[checkThisRow][checkThisColumn] > 0) {
+                                blackChecking[checkThisRow][checkThisColumn] = -1;
+                                break;
+                            }
+                            else {
+                                break;
+                            }
+                        }
+                        catch (Exception e) {}
+                    }
+                    
+                    // check down-left from black queen
+                    checkThisRow = queenRow;
+                    checkThisColumn = queenColumn;
+                    while ((checkThisRow <= 7) && (checkThisColumn) >= 0) {
+                        checkThisRow++;
+                        checkThisColumn--;
+                        try {
+                            if (boardState[checkThisRow][checkThisColumn] == 0) {
+                                blackChecking[checkThisRow][checkThisColumn] = -1;
+                            }
+                            else if (boardState[checkThisRow][checkThisColumn] > 0) {
+                                blackChecking[checkThisRow][checkThisColumn] = -1;
+                                break;
+                            }
+                            else {
+                                break;
+                            }
+                        }
+                        catch (Exception e) {}
+                    }
+
+                    // check up-left from black queen
+                    checkThisRow = queenRow;
+                    checkThisColumn = queenColumn;
+                    while ((checkThisRow >= 0) && (checkThisColumn) >= 0) {
+                        checkThisRow--;
+                        checkThisColumn--;
+                        try {
+                            if (boardState[checkThisRow][checkThisColumn] == 0) {
+                                blackChecking[checkThisRow][checkThisColumn] = -1;
+                            }
+                            else if (boardState[checkThisRow][checkThisColumn] > 0) {
+                                blackChecking[checkThisRow][checkThisColumn] = -1;
+                                break;
+                            }
+                            else {
+                                break;
+                            }
+                        }
+                        catch (Exception e) {}
+                    }    
+                    
+                    // check up from black queen
+                    checkThisRow = queenRow;
+                    checkThisColumn = queenColumn;
+                    while (checkThisRow >= 0) {
+                        checkThisRow--;
+                        try {
+                            if (boardState[checkThisRow][checkThisColumn] == 0) {
+                                blackChecking[checkThisRow][checkThisColumn] = -1;
+                            }
+                            else if (boardState[checkThisRow][checkThisColumn] > 0) {
+                                blackChecking[checkThisRow][checkThisColumn] = -1;
+                                break;
+                            }
+                            else {
+                                break;
+                            }
+                        }
+                        catch (Exception e) {}
+                    }
+                    
+                    // check right from black queen
+                    checkThisRow = queenRow;
+                    checkThisColumn = queenColumn;
+                    while (checkThisColumn <= 7) {
+                        checkThisColumn++;
+                        try {
+                            if (boardState[checkThisRow][checkThisColumn] == 0) {
+                                blackChecking[checkThisRow][checkThisColumn] = -1;
+                            }
+                            else if (boardState[checkThisRow][checkThisColumn] > 0) {
+                                blackChecking[checkThisRow][checkThisColumn] = -1;
+                                break;
+                            }
+                            else {
+                                break;
+                            }
+                        }
+                        catch (Exception e) {}
+                    }
+                    
+                    // check down from black queen
+                    checkThisRow = queenRow;
+                    checkThisColumn = queenColumn;
+                    while (checkThisRow <= 7) {
+                        checkThisRow++;
+                        try {
+                            if (boardState[checkThisRow][checkThisColumn] == 0) {
+                                blackChecking[checkThisRow][checkThisColumn] = -1;
+                            }
+                            else if (boardState[checkThisRow][checkThisColumn] > 0) {
+                                blackChecking[checkThisRow][checkThisColumn] = -1;
+                                break;
+                            }
+                            else {
+                                break;
+                            }
+                        }
+                        catch (Exception e) {}
+                    }
+
+                    // check left from black queen
+                    checkThisRow = queenRow;
+                    checkThisColumn = queenColumn;
+                    while (checkThisColumn >= 0) {
+                        checkThisColumn--;
+                        try {
+                            if (boardState[checkThisRow][checkThisColumn] == 0) {
+                                blackChecking[checkThisRow][checkThisColumn] = -1;
+                            }
+                            else if (boardState[checkThisRow][checkThisColumn] > 0) {
+                                blackChecking[checkThisRow][checkThisColumn] = -1;
+                                break;
+                            }
+                            else {
+                                break;
+                            }
+                        }
+                        catch (Exception e) {}
+                    }                    
+                }                
+            }
+        }
+        
+        /* 
+        For testing, print out all black checking positions
+        System.out.println("\nPrint out black checking positions\n");
+        for (int i = 0; i < 8; i++) {
+            for (int j = 0; j < 8; j++) {
+                if (blackChecking[i][j] < 0)
+                    System.out.print(blackChecking[i][j] + " ");
+                else
+                    System.out.print(blackChecking[i][j] + "  ");
+            }
+            System.out.println("");
+        }
+        */
+                
         // if proposed move is not a valid king move, return false
         if (validKingMoves[proposedRow][proposedColumn] != 1) {
             System.out.println();
             System.out.println("Not a valid king move\n");
+            return false;
+        }
+        
+        // if king is trying to a valid move, but is moving into a black
+        // piece's checked position, return false
+        if ((validKingMoves[proposedRow][proposedColumn] == 1) &&
+                blackChecking[proposedRow][proposedColumn] == -1) {
+            System.out.println();
+            System.out.println("Cannot move king into check");
             return false;
         }
         
