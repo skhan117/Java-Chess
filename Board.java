@@ -24,11 +24,14 @@ public class Board {
     public Board() {
 
         boardState = new int[8][8];
-        
+        deadPieces = new ArrayList<Integer>();
+        startGame();
+    }
+    
+    public void startGame() {
+        resetBoard();
         setupWhitePieces();
         setupBlackPieces();
-        
-        deadPieces = new ArrayList<Integer>();
     }
     
     // Getter for boardState
@@ -77,6 +80,15 @@ public class Board {
         boardState[0][5] = -2;
         boardState[0][3] = -5;
         boardState[0][4] = -6;        
+    }
+    
+    // Reset all tiles to 0
+    public void resetBoard() {
+        for (int i = 0; i < 8; i++) {
+            for (int j = 0; j < 8; j++) {
+                boardState[i][j] = 0;
+            }
+        }
     }
 
     // makeAWhitePawnMove takes four arguments:
