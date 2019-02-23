@@ -1,3 +1,9 @@
+/*
+    The Tile class describes an individual tile on the 8x8
+    grid representing a chessboard. It will handle the graphical
+    representation of pieces occupying the tile, or an empty tile.
+*/
+
 import java.awt.*;
 import javax.swing.*;
 
