@@ -1,5 +1,5 @@
 /*
-    The ChatServerModule class sets up and runs a simple IRC
+    The ChatServerModule class sets up and runs a simple
     chat server module on port 5320.
 */
 import java.io.*;
